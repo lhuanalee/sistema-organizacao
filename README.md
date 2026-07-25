@@ -4,8 +4,12 @@ Sistema pessoal para organizar tarefas e a rotina do dia a dia: lista de
 tarefas + calendário com horários (dia/semana/mês), onde você arrasta as
 tarefas da lista para os horários do seu dia.
 
-🔗 **Demo online:** _em breve — link do deploy será adicionado aqui assim que
-estiver no ar._
+🔗 **Demo online:** https://sistema-organizacao-jade.vercel.app
+
+> ⚠️ O deploy está no ar, mas **login e cadastro ainda não funcionam** nele:
+> o app hoje usa um banco SQLite local, que não existe no ambiente da
+> Vercel. Veja a seção [Banco de dados](#banco-de-dados) abaixo para o
+> próximo passo.
 
 ## O que já está pronto
 

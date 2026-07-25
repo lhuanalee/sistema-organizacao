@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Minha Rotina Organizada
 
-## Getting Started
+Sistema pessoal para organizar tarefas e a rotina do dia a dia: lista de
+tarefas + calendário com horários (dia/semana/mês), onde você arrasta as
+tarefas da lista para os horários do seu dia.
 
-First, run the development server:
+🔗 **Demo online:** _em breve — link do deploy será adicionado aqui assim que
+estiver no ar._
+
+## O que já está pronto
+
+- Login/criar conta (só você acessa seus dados)
+- Lista de tarefas (backlog) com categorias coloridas e prioridade
+- Calendário com visão de Dia / Semana / Mês e horários (estilo Google
+  Calendar)
+- Arrastar tarefa da lista para o calendário para agendar
+- Editar, mover, redimensionar e marcar tarefas como concluídas
+- Criar novas categorias na hora
+
+## Tecnologias
+
+- [Next.js](https://nextjs.org/) 16 (App Router) + React 19 + TypeScript
+- [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
+- [Prisma ORM](https://www.prisma.io/) (SQLite em desenvolvimento)
+- [NextAuth](https://authjs.dev/) para autenticação
+- [FullCalendar](https://fullcalendar.io/) para o calendário arrastável
+
+## Como baixar o projeto
+
+Clonando com Git:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/lhuanalee/sistema-organizacao.git
+cd sistema-organizacao
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ou, se preferir sem usar Git: acesse o repositório em
+[github.com/lhuanalee/sistema-organizacao](https://github.com/lhuanalee/sistema-organizacao),
+clique em **Code → Download ZIP** e extraia o arquivo no seu computador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Como rodar localmente
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npx prisma migrate dev   # cria o banco local (dev.db) e as tabelas
+npm run dev
+```
 
-## Learn More
+Depois abra [http://localhost:3000](http://localhost:3000) no navegador.
+Na primeira vez, crie sua conta em "Criar conta".
 
-To learn more about Next.js, take a look at the following resources:
+Você também vai precisar de um arquivo `.env` na raiz do projeto com:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+DATABASE_URL="file:./dev.db"
+AUTH_SECRET="qualquer-string-secreta-aleatoria"
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Banco de dados
 
-## Deploy on Vercel
+Por enquanto os dados ficam num banco local (SQLite, arquivo `dev.db`) só
+para desenvolvimento. Antes de publicar o sistema na internet de forma
+totalmente funcional (login e tarefas realmente salvando, acesso também pelo
+celular), precisamos:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Criar um banco de dados na nuvem (gratuito) via Vercel Marketplace
+2. Trocar a configuração do Prisma para apontar pra esse banco
+3. Fazer o deploy do site na Vercel
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Isso é rápido de fazer quando você estiver pronta — é só avisar.
+
+## Comandos úteis
+
+```bash
+npm run dev       # roda o site localmente
+npm run build     # gera a versão de produção
+npx prisma studio # abre uma interface visual pra ver os dados salvos
+```

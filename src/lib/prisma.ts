@@ -5,9 +5,15 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL ?? "",
-});
+// Supabase's pooler cert isn't in Node's default trust store; "require" now
+// maps to strict verify-full (see pg-connection-string), so downgrade to
+// no-verify explicitly instead of failing the TLS handshake.
+const connectionString = (process.env.DATABASE_URL ?? "").replace(
+  "sslmode=require",
+  "sslmode=no-verify"
+);
+
+const adapter = new PrismaPg({ connectionString });
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 

@@ -29,6 +29,7 @@ export function PlannerApp({
     end: string;
   } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileView, setMobileView] = useState<"tasks" | "calendar">("tasks");
 
   const backlog = useMemo(
     () =>
@@ -130,11 +131,40 @@ export function PlannerApp({
   }
 
   return (
-    <div className="relative flex flex-1 overflow-hidden">
+    <div className="relative flex flex-1 flex-col overflow-hidden md:flex-row">
+      <div className="flex shrink-0 gap-2 border-b border-border/70 bg-card p-2 md:hidden">
+        <button
+          type="button"
+          onClick={() => setMobileView("tasks")}
+          className={cn(
+            "flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+            mobileView === "tasks"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:bg-secondary"
+          )}
+        >
+          Tarefas
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileView("calendar")}
+          className={cn(
+            "flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+            mobileView === "calendar"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:bg-secondary"
+          )}
+        >
+          Calendário
+        </button>
+      </div>
+
       <div
         className={cn(
-          "shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out",
-          sidebarOpen ? "w-80" : "w-0"
+          "overflow-hidden md:shrink-0 md:transition-[width] md:duration-300 md:ease-in-out",
+          mobileView === "tasks" ? "flex-1" : "hidden",
+          "md:flex md:flex-none",
+          sidebarOpen ? "md:w-80" : "md:w-0"
         )}
       >
         <TaskSidebar
@@ -159,7 +189,7 @@ export function PlannerApp({
         type="button"
         onClick={() => setSidebarOpen((v) => !v)}
         title={sidebarOpen ? "Esconder lista de tarefas" : "Mostrar lista de tarefas"}
-        className="absolute top-1/2 z-10 flex size-7 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition-[left] duration-300 ease-in-out hover:text-foreground"
+        className="absolute top-1/2 z-10 hidden size-7 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition-[left] duration-300 ease-in-out hover:text-foreground md:flex"
         style={{ left: sidebarOpen ? "312px" : "8px" }}
       >
         {sidebarOpen ? (
@@ -169,7 +199,13 @@ export function PlannerApp({
         )}
       </button>
 
-      <div className="flex-1 overflow-hidden p-4">
+      <div
+        className={cn(
+          "flex-1 overflow-hidden p-4",
+          mobileView === "calendar" ? "block" : "hidden",
+          "md:block"
+        )}
+      >
         <CalendarView
           tasks={calendarTasks}
           categories={categories}

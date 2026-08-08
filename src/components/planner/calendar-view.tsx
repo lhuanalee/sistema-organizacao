@@ -16,7 +16,7 @@ import type {
   EventInput,
 } from "@fullcalendar/core";
 import { CategoryDTO, TaskDTO } from "@/lib/types";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export function CalendarView({
   tasks,
@@ -38,6 +38,14 @@ export function CalendarView({
     [categories]
   );
   const calendarRef = useRef<FullCalendar>(null);
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   const events: EventInput[] = useMemo(
     () =>
@@ -64,13 +72,16 @@ export function CalendarView({
   return (
     <div className="h-full rounded-3xl border bg-card p-3 shadow-sm [&_.fc]:h-full">
       <FullCalendar
+        key={isMobile ? "mobile" : "desktop"}
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        initialView="timeGridWeek"
+        initialView={isMobile ? "timeGridDay" : "timeGridWeek"}
         headerToolbar={{
           left: "prev,next today",
           center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay",
+          right: isMobile
+            ? "dayGridMonth,timeGridDay"
+            : "dayGridMonth,timeGridWeek,timeGridDay",
         }}
         buttonText={{ today: "Hoje", month: "Mês", week: "Semana", day: "Dia" }}
         locale={ptBrLocale}

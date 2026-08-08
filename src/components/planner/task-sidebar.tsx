@@ -41,7 +41,7 @@ export function TaskSidebar({
   const categoryById = new Map(categories.map((c) => [c.id, c]));
 
   return (
-    <aside className="flex w-80 shrink-0 flex-col gap-3 overflow-hidden border-r border-border/70 bg-sidebar p-4">
+    <aside className="flex h-full w-full shrink-0 flex-col gap-3 overflow-hidden border-border/70 bg-sidebar p-4 md:w-80 md:border-r">
       <div className="flex items-center justify-between">
         <h2 className="font-heading text-base font-semibold text-foreground">
           🍃 Lista de tarefas

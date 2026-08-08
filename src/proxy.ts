@@ -9,8 +9,9 @@ export default auth((req) => {
   const isAuthRoute =
     req.nextUrl.pathname.startsWith("/login") ||
     req.nextUrl.pathname.startsWith("/registrar");
+  const isPublicRoute = isAuthRoute || req.nextUrl.pathname.startsWith("/demo");
 
-  if (!isLoggedIn && !isAuthRoute) {
+  if (!isLoggedIn && !isPublicRoute) {
     const loginUrl = new URL("/login", req.nextUrl.origin);
     return NextResponse.redirect(loginUrl);
   }

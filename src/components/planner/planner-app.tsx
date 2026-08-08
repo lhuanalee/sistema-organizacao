@@ -13,9 +13,11 @@ import { cn } from "@/lib/utils";
 export function PlannerApp({
   initialTasks,
   initialCategories,
+  demo = false,
 }: {
   initialTasks: TaskDTO[];
   initialCategories: CategoryDTO[];
+  demo?: boolean;
 }) {
   const [tasks, setTasks] = useState<TaskDTO[]>(initialTasks);
   const [categories, setCategories] = useState<CategoryDTO[]>(initialCategories);
@@ -67,8 +69,13 @@ export function PlannerApp({
     allDay: boolean
   ) {
     try {
-      const updated = await scheduleTask(taskId, start, end, allDay);
-      upsertTask(updated);
+      if (demo) {
+        const task = tasks.find((t) => t.id === taskId);
+        if (task) upsertTask({ ...task, start, end, allDay });
+      } else {
+        const updated = await scheduleTask(taskId, start, end, allDay);
+        upsertTask(updated);
+      }
       toast.success("Tarefa agendada!");
     } catch {
       toast.error("Não foi possível agendar a tarefa.");
@@ -82,8 +89,13 @@ export function PlannerApp({
     allDay: boolean
   ) {
     try {
-      const updated = await updateTask(taskId, { start, end, allDay });
-      upsertTask(updated);
+      if (demo) {
+        const task = tasks.find((t) => t.id === taskId);
+        if (task) upsertTask({ ...task, start, end, allDay });
+      } else {
+        const updated = await updateTask(taskId, { start, end, allDay });
+        upsertTask(updated);
+      }
     } catch {
       toast.error("Não foi possível mover a tarefa.");
     }
@@ -170,6 +182,7 @@ export function PlannerApp({
       <TaskDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
+        demo={demo}
         task={editingTask}
         initialSchedule={newTaskSchedule}
         categories={categories}

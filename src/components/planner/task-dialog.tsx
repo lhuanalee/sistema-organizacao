@@ -41,6 +41,7 @@ export function TaskDialog({
   task,
   initialSchedule,
   categories,
+  demo = false,
   onCreated,
   onUpdated,
   onDeleted,
@@ -51,6 +52,7 @@ export function TaskDialog({
   task: TaskDTO | null;
   initialSchedule?: { start: string; end: string } | null;
   categories: CategoryDTO[];
+  demo?: boolean;
   onCreated: (task: TaskDTO) => void;
   onUpdated: (task: TaskDTO) => void;
   onDeleted: (id: string) => void;
@@ -65,6 +67,7 @@ export function TaskDialog({
             task={task}
             initialSchedule={initialSchedule ?? null}
             categories={categories}
+            demo={demo}
             onOpenChange={onOpenChange}
             onCreated={onCreated}
             onUpdated={onUpdated}
@@ -81,6 +84,7 @@ function TaskDialogForm({
   task,
   initialSchedule,
   categories,
+  demo,
   onOpenChange,
   onCreated,
   onUpdated,
@@ -90,6 +94,7 @@ function TaskDialogForm({
   task: TaskDTO | null;
   initialSchedule: { start: string; end: string } | null;
   categories: CategoryDTO[];
+  demo: boolean;
   onOpenChange: (open: boolean) => void;
   onCreated: (task: TaskDTO) => void;
   onUpdated: (task: TaskDTO) => void;
@@ -147,10 +152,19 @@ function TaskDialogForm({
       };
 
       if (task) {
-        const updated = await updateTask(task.id, { ...payload, done });
+        const updated = demo
+          ? { ...task, ...payload, description: payload.description ?? null, done }
+          : await updateTask(task.id, { ...payload, done });
         onUpdated(updated);
       } else {
-        const created = await createTask(payload);
+        const created = demo
+          ? {
+              ...payload,
+              id: crypto.randomUUID(),
+              description: payload.description ?? null,
+              done: false,
+            }
+          : await createTask(payload);
         onCreated(created);
       }
       onOpenChange(false);
@@ -163,7 +177,7 @@ function TaskDialogForm({
     if (!task) return;
     setSaving(true);
     try {
-      await deleteTask(task.id);
+      if (!demo) await deleteTask(task.id);
       onDeleted(task.id);
       onOpenChange(false);
     } finally {
@@ -173,7 +187,9 @@ function TaskDialogForm({
 
   async function handleAddCategory() {
     if (!newCategoryName.trim()) return;
-    const category = await createCategory(newCategoryName.trim(), newCategoryColor);
+    const category = demo
+      ? { id: crypto.randomUUID(), name: newCategoryName.trim(), color: newCategoryColor }
+      : await createCategory(newCategoryName.trim(), newCategoryColor);
     onCategoryCreated(category);
     setCategoryId(category.id);
     setNewCategoryName("");

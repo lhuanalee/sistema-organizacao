@@ -164,14 +164,14 @@ function renderEventContent(arg: EventContentArg) {
 
   return (
     <div
-      className={`flex h-full flex-col gap-0.5 overflow-hidden px-1.5 py-1 text-xs leading-tight ${done ? "opacity-60 line-through" : ""}`}
+      className={`flex h-full flex-col justify-center overflow-hidden px-1 py-0 leading-[1.15] ${done ? "opacity-60 line-through" : ""}`}
     >
-      <span className="truncate font-semibold">
+      <span className="truncate text-[10px] font-semibold">
         {done && "🌱 "}
         {arg.event.title}
       </span>
       {arg.timeText && (
-        <span className="truncate text-[11px] opacity-90">{arg.timeText}</span>
+        <span className="truncate text-[9px] opacity-80">{arg.timeText}</span>
       )}
     </div>
   );

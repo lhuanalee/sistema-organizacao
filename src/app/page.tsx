@@ -31,6 +31,7 @@ export default async function Home() {
     id: t.id,
     title: t.title,
     description: t.description,
+    type: t.type,
     priority: t.priority,
     done: t.done,
     start: t.start ? t.start.toISOString() : null,

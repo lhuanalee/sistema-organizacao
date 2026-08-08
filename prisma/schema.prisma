@@ -42,10 +42,18 @@ enum Priority {
   HIGH
 }
 
+// ACTIVITY: a to-do — shows a "done" checkbox, struck through once complete.
+// COMMITMENT: a fixed appointment (class, event, party) — nothing to "finish".
+enum TaskType {
+  ACTIVITY
+  COMMITMENT
+}
+
 model Task {
   id          String    @id @default(cuid())
   title       String
   description String?
+  type        TaskType  @default(ACTIVITY)
   priority    Priority  @default(MEDIUM)
   done        Boolean   @default(false)
   completedAt DateTime?

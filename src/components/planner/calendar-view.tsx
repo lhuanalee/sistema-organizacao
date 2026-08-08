@@ -61,7 +61,7 @@ export function CalendarView({
             title: t.title,
             backgroundColor: color ?? "#94a3b8",
             borderColor: color ?? "#94a3b8",
-            extendedProps: { done: t.done },
+            extendedProps: { done: t.done, type: t.type },
           };
 
           if (t.recurringDaysOfWeek.length > 0) {
@@ -168,12 +168,16 @@ export function CalendarView({
 }
 
 function renderEventContent(arg: EventContentArg) {
-  const done = Boolean(arg.event.extendedProps.done);
+  // Only activities track completion — commitments (classes, events) just happen.
+  const done =
+    arg.event.extendedProps.type === "ACTIVITY" &&
+    Boolean(arg.event.extendedProps.done);
 
   // Month cells are too short for a stacked layout, so keep those on one line.
   if (arg.view.type === "dayGridMonth") {
     return (
       <div
+        title={arg.event.title}
         className={`flex items-center gap-1 overflow-hidden px-1 py-0.5 text-xs font-medium ${done ? "opacity-60 line-through" : ""}`}
       >
         {done && <span>🌱</span>}
@@ -184,6 +188,7 @@ function renderEventContent(arg: EventContentArg) {
 
   return (
     <div
+      title={arg.event.title}
       className={`flex h-full flex-col justify-center overflow-hidden px-1 py-0 leading-[1.15] ${done ? "opacity-60 line-through" : ""}`}
     >
       <span className="truncate text-[10px] font-semibold">

@@ -22,6 +22,7 @@ export function TaskCard({
       data-task-id={task.id}
       data-title={task.title}
       data-duration="01:00"
+      title={task.title}
     >
       <span
         className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full text-sm"
@@ -33,7 +34,9 @@ export function TaskCard({
         <p
           className={cn(
             "truncate text-sm font-semibold text-foreground",
-            task.done && "text-muted-foreground line-through"
+            task.type === "ACTIVITY" &&
+              task.done &&
+              "text-muted-foreground line-through"
           )}
         >
           {task.title}

@@ -20,7 +20,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CategoryDTO, Priority, PRIORITY_LABEL, TaskDTO } from "@/lib/types";
+import {
+  CategoryDTO,
+  Priority,
+  PRIORITY_LABEL,
+  TaskDTO,
+  TaskType,
+  TASK_TYPE_LABEL,
+} from "@/lib/types";
 import { createTask, deleteTask, updateTask } from "@/lib/actions/tasks";
 import { createCategory } from "@/lib/actions/categories";
 import { format } from "date-fns";
@@ -118,6 +125,7 @@ function TaskDialogForm({
 
   const [title, setTitle] = useState(task?.title ?? "");
   const [description, setDescription] = useState(task?.description ?? "");
+  const [type, setType] = useState<TaskType>(task?.type ?? "ACTIVITY");
   const [categoryId, setCategoryId] = useState<string>(
     task?.categoryId ?? "none"
   );
@@ -165,6 +173,7 @@ function TaskDialogForm({
         title: title.trim(),
         description: description.trim() || undefined,
         categoryId: categoryId === "none" ? null : categoryId,
+        type,
         priority,
         start: start ? start.toISOString() : null,
         end: end ? end.toISOString() : null,
@@ -172,10 +181,17 @@ function TaskDialogForm({
         recurringDaysOfWeek: scheduled && recurring ? recurringDays : [],
       };
 
+      const effectiveDone = type === "ACTIVITY" ? done : false;
+
       if (task) {
         const updated = demo
-          ? { ...task, ...payload, description: payload.description ?? null, done }
-          : await updateTask(task.id, { ...payload, done });
+          ? {
+              ...task,
+              ...payload,
+              description: payload.description ?? null,
+              done: effectiveDone,
+            }
+          : await updateTask(task.id, { ...payload, done: effectiveDone });
         onUpdated(updated);
       } else {
         const created = demo
@@ -242,6 +258,35 @@ function TaskDialogForm({
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
           />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-xs">Tipo</Label>
+          <div className="flex gap-1.5">
+            {(Object.keys(TASK_TYPE_LABEL) as TaskType[]).map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => {
+                  setType(t);
+                  if (t === "COMMITMENT") setDone(false);
+                }}
+                className={cn(
+                  "flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+                  type === t
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
+                )}
+              >
+                {TASK_TYPE_LABEL[t]}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {type === "ACTIVITY"
+              ? "Uma tarefa para fazer — pode marcar como concluída."
+              : "Um compromisso fixo (aula, evento, festa, ida a um lugar)."}
+          </p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -405,7 +450,7 @@ function TaskDialogForm({
           </div>
         )}
 
-        {task && (
+        {task && type === "ACTIVITY" && (
           <div className="flex items-center gap-2">
             <Checkbox
               id="done"

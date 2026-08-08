@@ -1,4 +1,5 @@
 export type Priority = "LOW" | "MEDIUM" | "HIGH";
+export type TaskType = "ACTIVITY" | "COMMITMENT";
 
 export interface CategoryDTO {
   id: string;
@@ -10,6 +11,7 @@ export interface TaskDTO {
   id: string;
   title: string;
   description: string | null;
+  type: TaskType;
   priority: Priority;
   done: boolean;
   start: string | null;
@@ -18,6 +20,11 @@ export interface TaskDTO {
   categoryId: string | null;
   recurringDaysOfWeek: number[];
 }
+
+export const TASK_TYPE_LABEL: Record<TaskType, string> = {
+  ACTIVITY: "Atividade",
+  COMMITMENT: "Compromisso",
+};
 
 export const PRIORITY_LABEL: Record<Priority, string> = {
   LOW: "Baixa",

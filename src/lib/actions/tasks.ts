@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { Priority } from "@/generated/prisma/client";
+import { Priority, TaskType } from "@/generated/prisma/client";
 import { TaskDTO } from "@/lib/types";
 
 async function requireUserId() {
@@ -16,6 +16,7 @@ function toDTO(t: {
   id: string;
   title: string;
   description: string | null;
+  type: TaskType;
   priority: Priority;
   done: boolean;
   start: Date | null;
@@ -28,6 +29,7 @@ function toDTO(t: {
     id: t.id,
     title: t.title,
     description: t.description,
+    type: t.type,
     priority: t.priority,
     done: t.done,
     start: t.start ? t.start.toISOString() : null,
@@ -42,6 +44,7 @@ export async function createTask(input: {
   title: string;
   description?: string;
   categoryId?: string | null;
+  type?: TaskType;
   priority?: Priority;
   start?: string | null;
   end?: string | null;
@@ -55,6 +58,7 @@ export async function createTask(input: {
       title: input.title,
       description: input.description || null,
       categoryId: input.categoryId || null,
+      type: input.type ?? "ACTIVITY",
       priority: input.priority ?? "MEDIUM",
       start: input.start ? new Date(input.start) : null,
       end: input.end ? new Date(input.end) : null,
@@ -74,6 +78,7 @@ export async function updateTask(
     title: string;
     description: string | null;
     categoryId: string | null;
+    type: TaskType;
     priority: Priority;
     start: string | null;
     end: string | null;

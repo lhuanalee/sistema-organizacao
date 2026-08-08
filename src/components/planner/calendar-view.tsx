@@ -149,13 +149,30 @@ export function CalendarView({
 
 function renderEventContent(arg: EventContentArg) {
   const done = Boolean(arg.event.extendedProps.done);
+
+  // Month cells are too short for a stacked layout, so keep those on one line.
+  if (arg.view.type === "dayGridMonth") {
+    return (
+      <div
+        className={`flex items-center gap-1 overflow-hidden px-1 py-0.5 text-xs font-medium ${done ? "opacity-60 line-through" : ""}`}
+      >
+        {done && <span>🌱</span>}
+        <span className="truncate">{arg.event.title}</span>
+      </div>
+    );
+  }
+
   return (
     <div
-      className={`flex items-center gap-1 px-1 py-0.5 text-xs font-medium ${done ? "opacity-60 line-through" : ""}`}
+      className={`flex h-full flex-col gap-0.5 overflow-hidden px-1.5 py-1 text-xs leading-tight ${done ? "opacity-60 line-through" : ""}`}
     >
-      {done && <span>🌱</span>}
-      {arg.timeText && <span className="font-semibold">{arg.timeText}</span>}
-      <span className="truncate">{arg.event.title}</span>
+      <span className="truncate font-semibold">
+        {done && "🌱 "}
+        {arg.event.title}
+      </span>
+      {arg.timeText && (
+        <span className="truncate text-[11px] opacity-90">{arg.timeText}</span>
+      )}
     </div>
   );
 }

@@ -18,6 +18,7 @@ const demoCategories: CategoryDTO[] = [
   { id: "cat-saude", name: "Saúde", color: "#6B9B6E" },
   { id: "cat-casa", name: "Casa", color: "#D6A73B" },
   { id: "cat-pessoal", name: "Pessoal", color: "#9E86B4" },
+  { id: "cat-faculdade", name: "Faculdade", color: "#5B9C8F" },
 ];
 
 const demoTasks: TaskDTO[] = [
@@ -31,6 +32,7 @@ const demoTasks: TaskDTO[] = [
     end: atDay(0, 10, 0),
     allDay: false,
     categoryId: "cat-trabalho",
+    recurringDaysOfWeek: [],
   },
   {
     id: "demo-task-2",
@@ -42,6 +44,7 @@ const demoTasks: TaskDTO[] = [
     end: atDay(0, 19, 0),
     allDay: false,
     categoryId: "cat-saude",
+    recurringDaysOfWeek: [],
   },
   {
     id: "demo-task-3",
@@ -53,6 +56,7 @@ const demoTasks: TaskDTO[] = [
     end: atDay(1, 18, 0),
     allDay: false,
     categoryId: "cat-casa",
+    recurringDaysOfWeek: [],
   },
   {
     id: "demo-task-4",
@@ -64,6 +68,7 @@ const demoTasks: TaskDTO[] = [
     end: atDay(2, 15, 0),
     allDay: false,
     categoryId: "cat-saude",
+    recurringDaysOfWeek: [],
   },
   {
     id: "demo-task-5",
@@ -75,6 +80,7 @@ const demoTasks: TaskDTO[] = [
     end: atDay(0, 21, 30),
     allDay: false,
     categoryId: "cat-pessoal",
+    recurringDaysOfWeek: [],
   },
   {
     id: "demo-task-6",
@@ -86,6 +92,7 @@ const demoTasks: TaskDTO[] = [
     end: null,
     allDay: false,
     categoryId: "cat-casa",
+    recurringDaysOfWeek: [],
   },
   {
     id: "demo-task-7",
@@ -97,6 +104,19 @@ const demoTasks: TaskDTO[] = [
     end: null,
     allDay: false,
     categoryId: "cat-pessoal",
+    recurringDaysOfWeek: [],
+  },
+  {
+    id: "demo-task-8",
+    title: "Aula de Cálculo",
+    description: "Toda segunda e quarta.",
+    priority: "MEDIUM",
+    done: false,
+    start: atDay(-7, 8, 0),
+    end: atDay(-7, 10, 0),
+    allDay: false,
+    categoryId: "cat-faculdade",
+    recurringDaysOfWeek: [1, 3],
   },
 ];
 

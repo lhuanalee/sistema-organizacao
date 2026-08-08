@@ -16,6 +16,7 @@ export interface TaskDTO {
   end: string | null;
   allDay: boolean;
   categoryId: string | null;
+  recurringDaysOfWeek: number[];
 }
 
 export const PRIORITY_LABEL: Record<Priority, string> = {

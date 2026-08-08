@@ -24,6 +24,7 @@ import { CategoryDTO, Priority, PRIORITY_LABEL, TaskDTO } from "@/lib/types";
 import { createTask, deleteTask, updateTask } from "@/lib/actions/tasks";
 import { createCategory } from "@/lib/actions/categories";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const COLORS = [
   "#6B93B0",
@@ -34,6 +35,9 @@ const COLORS = [
   "#B5765F",
   "#5B9C8F",
 ];
+
+// Index = JS Date.getDay() / FullCalendar daysOfWeek (0 = Domingo).
+const WEEKDAY_LABELS = ["D", "S", "T", "Q", "Q", "S", "S"];
 
 export function TaskDialog({
   open,
@@ -128,14 +132,30 @@ function TaskDialogForm({
   const [endTime, setEndTime] = useState(
     scheduledEnd ? format(scheduledEnd, "HH:mm") : "10:00"
   );
+  const [recurring, setRecurring] = useState(
+    (task?.recurringDaysOfWeek.length ?? 0) > 0
+  );
+  const [recurringDays, setRecurringDays] = useState<number[]>(
+    task?.recurringDaysOfWeek ?? []
+  );
   const [done, setDone] = useState(task?.done ?? false);
   const [saving, setSaving] = useState(false);
   const [addingCategory, setAddingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryColor, setNewCategoryColor] = useState(COLORS[0]);
 
+  function toggleRecurringDay(day: number) {
+    setRecurringDays((prev) =>
+      prev.includes(day)
+        ? prev.filter((d) => d !== day)
+        : [...prev, day].sort()
+    );
+  }
+
+  const canSave = title.trim().length > 0 && (!recurring || recurringDays.length > 0);
+
   async function handleSave() {
-    if (!title.trim()) return;
+    if (!canSave) return;
     setSaving(true);
     try {
       const start = scheduled ? new Date(`${date}T${startTime}:00`) : null;
@@ -149,6 +169,7 @@ function TaskDialogForm({
         start: start ? start.toISOString() : null,
         end: end ? end.toISOString() : null,
         allDay: false,
+        recurringDaysOfWeek: scheduled && recurring ? recurringDays : [],
       };
 
       if (task) {
@@ -320,30 +341,66 @@ function TaskDialogForm({
         </div>
 
         {scheduled && (
-          <div className="grid grid-cols-3 gap-2">
-            <div className="flex flex-col gap-1">
-              <Label className="text-xs">Data</Label>
-              <Input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="recurring"
+                checked={recurring}
+                onCheckedChange={(v) => setRecurring(Boolean(v))}
               />
+              <Label htmlFor="recurring">Repete semanalmente</Label>
             </div>
-            <div className="flex flex-col gap-1">
-              <Label className="text-xs">Início</Label>
-              <Input
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <Label className="text-xs">Fim</Label>
-              <Input
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-              />
+
+            {recurring && (
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-xs">Dias da semana</Label>
+                <div className="flex gap-1.5">
+                  {WEEKDAY_LABELS.map((label, day) => (
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() => toggleRecurringDay(day)}
+                      className={cn(
+                        "flex size-8 items-center justify-center rounded-full text-xs font-semibold transition-colors",
+                        recurringDays.includes(day)
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-secondary-foreground hover:bg-secondary/70"
+                      )}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-3 gap-2">
+              <div className="flex flex-col gap-1">
+                <Label className="text-xs">
+                  {recurring ? "A partir de" : "Data"}
+                </Label>
+                <Input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <Label className="text-xs">Início</Label>
+                <Input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <Label className="text-xs">Fim</Label>
+                <Input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                />
+              </div>
             </div>
           </div>
         )}
@@ -378,7 +435,7 @@ function TaskDialogForm({
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button type="button" onClick={handleSave} disabled={saving || !title.trim()}>
+          <Button type="button" onClick={handleSave} disabled={saving || !canSave}>
             Salvar
           </Button>
         </div>

@@ -22,6 +22,7 @@ function toDTO(t: {
   end: Date | null;
   allDay: boolean;
   categoryId: string | null;
+  recurringDaysOfWeek: number[];
 }): TaskDTO {
   return {
     id: t.id,
@@ -33,6 +34,7 @@ function toDTO(t: {
     end: t.end ? t.end.toISOString() : null,
     allDay: t.allDay,
     categoryId: t.categoryId,
+    recurringDaysOfWeek: t.recurringDaysOfWeek,
   };
 }
 
@@ -44,6 +46,7 @@ export async function createTask(input: {
   start?: string | null;
   end?: string | null;
   allDay?: boolean;
+  recurringDaysOfWeek?: number[];
 }): Promise<TaskDTO> {
   const userId = await requireUserId();
 
@@ -56,6 +59,7 @@ export async function createTask(input: {
       start: input.start ? new Date(input.start) : null,
       end: input.end ? new Date(input.end) : null,
       allDay: input.allDay ?? false,
+      recurringDaysOfWeek: input.recurringDaysOfWeek ?? [],
       userId,
     },
   });
@@ -75,6 +79,7 @@ export async function updateTask(
     end: string | null;
     allDay: boolean;
     done: boolean;
+    recurringDaysOfWeek: number[];
   }>
 ): Promise<TaskDTO> {
   const userId = await requireUserId();

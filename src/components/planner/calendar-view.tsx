@@ -17,6 +17,7 @@ import type {
 } from "@fullcalendar/core";
 import { CategoryDTO, TaskDTO } from "@/lib/types";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { format } from "date-fns";
 
 export function CalendarView({
   tasks,
@@ -55,15 +56,34 @@ export function CalendarView({
           const color = t.categoryId
             ? categoryById.get(t.categoryId)?.color
             : undefined;
-          return {
+          const base = {
             id: t.id,
             title: t.title,
-            start: t.start!,
-            end: t.end ?? undefined,
-            allDay: t.allDay,
             backgroundColor: color ?? "#94a3b8",
             borderColor: color ?? "#94a3b8",
             extendedProps: { done: t.done },
+          };
+
+          if (t.recurringDaysOfWeek.length > 0) {
+            const start = new Date(t.start!);
+            const end = t.end ? new Date(t.end) : start;
+            return {
+              ...base,
+              daysOfWeek: t.recurringDaysOfWeek,
+              startTime: format(start, "HH:mm:ss"),
+              endTime: format(end, "HH:mm:ss"),
+              startRecur: format(start, "yyyy-MM-dd"),
+              // Recurring instances are edited via the dialog (applies to
+              // every occurrence), not by dragging one on the calendar.
+              editable: false,
+            };
+          }
+
+          return {
+            ...base,
+            start: t.start!,
+            end: t.end ?? undefined,
+            allDay: t.allDay,
           };
         }),
     [tasks, categoryById]

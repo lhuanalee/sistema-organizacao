@@ -56,6 +56,11 @@ model Task {
   end    DateTime?
   allDay Boolean   @default(false)
 
+  // Days of week (0=Sun..6=Sat) this task repeats on. Empty means one-off.
+  // `start`'s date is the anchor the recurrence begins from; its time of
+  // day (and `end`'s) is reused as the weekly start/end time.
+  recurringDaysOfWeek Int[] @default([])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

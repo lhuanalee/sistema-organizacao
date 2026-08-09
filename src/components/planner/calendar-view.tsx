@@ -40,6 +40,7 @@ export function CalendarView({
     [categories]
   );
   const calendarRef = useRef<FullCalendar>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
@@ -47,6 +48,18 @@ export function CalendarView({
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // FullCalendar only re-measures on the window's "resize" event by default,
+  // so it doesn't notice the calendar column growing/shrinking when the
+  // sidebar is toggled (a CSS width transition, not a window resize).
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver(() => {
+      calendarRef.current?.getApi().updateSize();
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
   }, []);
 
   const events: EventInput[] = useMemo(
@@ -110,7 +123,10 @@ export function CalendarView({
   }, [tasks]);
 
   return (
-    <div className="h-full rounded-3xl border bg-card p-3 shadow-sm [&_.fc]:h-full">
+    <div
+      ref={containerRef}
+      className="h-full rounded-3xl border bg-card p-3 shadow-sm [&_.fc]:h-full"
+    >
       <FullCalendar
         key={isMobile ? "mobile" : "desktop"}
         ref={calendarRef}

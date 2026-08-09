@@ -17,6 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Minha Rotina Organizada",
   description: "Organize suas tarefas e sua rotina em um só lugar.",
+  appleWebApp: {
+    capable: true,
+    title: "Minha Rotina",
+    statusBarStyle: "default",
+  },
 };
 
 export default function RootLayout({

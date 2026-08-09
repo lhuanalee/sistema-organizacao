@@ -39,6 +39,8 @@ export default async function Home() {
     allDay: t.allDay,
     categoryId: t.categoryId,
     recurringDaysOfWeek: t.recurringDaysOfWeek,
+    recurringUntil: t.recurringUntil ? t.recurringUntil.toISOString() : null,
+    recurringExcludedDates: t.recurringExcludedDates.map((d) => d.toISOString()),
   }));
 
   const hour = new Date().getHours();

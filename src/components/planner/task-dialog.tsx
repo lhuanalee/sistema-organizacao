@@ -28,7 +28,13 @@ import {
   TaskType,
   TASK_TYPE_LABEL,
 } from "@/lib/types";
-import { createTask, deleteTask, updateTask } from "@/lib/actions/tasks";
+import {
+  createTask,
+  deleteFutureOccurrences,
+  deleteTask,
+  deleteTaskOccurrence,
+  updateTask,
+} from "@/lib/actions/tasks";
 import { createCategory } from "@/lib/actions/categories";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -50,6 +56,7 @@ export function TaskDialog({
   open,
   onOpenChange,
   task,
+  occurrenceDate,
   initialSchedule,
   categories,
   demo = false,
@@ -61,6 +68,7 @@ export function TaskDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   task: TaskDTO | null;
+  occurrenceDate?: string | null;
   initialSchedule?: { start: string; end: string } | null;
   categories: CategoryDTO[];
   demo?: boolean;
@@ -76,6 +84,7 @@ export function TaskDialog({
           <TaskDialogForm
             key={task?.id ?? "new"}
             task={task}
+            occurrenceDate={occurrenceDate ?? null}
             initialSchedule={initialSchedule ?? null}
             categories={categories}
             demo={demo}
@@ -93,6 +102,7 @@ export function TaskDialog({
 
 function TaskDialogForm({
   task,
+  occurrenceDate,
   initialSchedule,
   categories,
   demo,
@@ -103,6 +113,7 @@ function TaskDialogForm({
   onCategoryCreated,
 }: {
   task: TaskDTO | null;
+  occurrenceDate: string | null;
   initialSchedule: { start: string; end: string } | null;
   categories: CategoryDTO[];
   demo: boolean;
@@ -151,6 +162,13 @@ function TaskDialogForm({
   const [addingCategory, setAddingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryColor, setNewCategoryColor] = useState(COLORS[0]);
+  const [deleteMode, setDeleteMode] = useState(false);
+
+  const isRecurring = (task?.recurringDaysOfWeek.length ?? 0) > 0;
+  const occurrenceDateStr = format(
+    occurrenceDate ? new Date(occurrenceDate) : (scheduledStart ?? new Date()),
+    "yyyy-MM-dd"
+  );
 
   function toggleRecurringDay(day: number) {
     setRecurringDays((prev) =>
@@ -200,6 +218,8 @@ function TaskDialogForm({
               id: crypto.randomUUID(),
               description: payload.description ?? null,
               done: false,
+              recurringUntil: null,
+              recurringExcludedDates: [],
             }
           : await createTask(payload);
         onCreated(created);
@@ -210,12 +230,46 @@ function TaskDialogForm({
     }
   }
 
-  async function handleDelete() {
+  async function handleDeleteAll() {
     if (!task) return;
     setSaving(true);
     try {
       if (!demo) await deleteTask(task.id);
       onDeleted(task.id);
+      onOpenChange(false);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDeleteOccurrence() {
+    if (!task) return;
+    setSaving(true);
+    try {
+      const updated = demo
+        ? {
+            ...task,
+            recurringExcludedDates: [
+              ...task.recurringExcludedDates,
+              `${occurrenceDateStr}T00:00:00`,
+            ],
+          }
+        : await deleteTaskOccurrence(task.id, occurrenceDateStr);
+      onUpdated(updated);
+      onOpenChange(false);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDeleteFuture() {
+    if (!task) return;
+    setSaving(true);
+    try {
+      const updated = demo
+        ? { ...task, recurringUntil: `${occurrenceDateStr}T00:00:00` }
+        : await deleteFutureOccurrences(task.id, occurrenceDateStr);
+      onUpdated(updated);
       onOpenChange(false);
     } finally {
       setSaving(false);
@@ -464,15 +518,57 @@ function TaskDialogForm({
 
       <DialogFooter className="flex items-center sm:justify-between">
         {task ? (
-          <Button
-            type="button"
-            variant="ghost"
-            className="text-destructive"
-            onClick={handleDelete}
-            disabled={saving}
-          >
-            Excluir
-          </Button>
+          isRecurring && deleteMode ? (
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="text-destructive"
+                onClick={handleDeleteOccurrence}
+                disabled={saving}
+              >
+                Só esta
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="text-destructive"
+                onClick={handleDeleteFuture}
+                disabled={saving}
+              >
+                Esta e as próximas
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="text-destructive"
+                onClick={handleDeleteAll}
+                disabled={saving}
+              >
+                Todas
+              </Button>
+              <button
+                type="button"
+                className="text-xs text-muted-foreground underline underline-offset-2"
+                onClick={() => setDeleteMode(false)}
+              >
+                cancelar
+              </button>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="ghost"
+              className="text-destructive"
+              onClick={() => (isRecurring ? setDeleteMode(true) : handleDeleteAll())}
+              disabled={saving}
+            >
+              Excluir
+            </Button>
+          )
         ) : (
           <span />
         )}

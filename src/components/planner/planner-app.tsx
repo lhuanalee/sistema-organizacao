@@ -24,6 +24,9 @@ export function PlannerApp({
   const [categoryFilter, setCategoryFilter] = useState<string | "all">("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<TaskDTO | null>(null);
+  const [editingOccurrenceDate, setEditingOccurrenceDate] = useState<
+    string | null
+  >(null);
   const [newTaskSchedule, setNewTaskSchedule] = useState<{
     start: string;
     end: string;
@@ -102,11 +105,12 @@ export function PlannerApp({
     }
   }
 
-  function handleEventClick(taskId: string) {
+  function handleEventClick(taskId: string, occurrenceStart: string) {
     const task = tasks.find((t) => t.id === taskId);
     if (task) {
       setNewTaskSchedule(null);
       setEditingTask(task);
+      setEditingOccurrenceDate(occurrenceStart);
       setDialogOpen(true);
     }
   }
@@ -174,12 +178,14 @@ export function PlannerApp({
           onFilterCategory={setCategoryFilter}
           onNewTask={() => {
             setEditingTask(null);
+            setEditingOccurrenceDate(null);
             setNewTaskSchedule(null);
             setDialogOpen(true);
           }}
           onEditTask={(task) => {
             setNewTaskSchedule(null);
             setEditingTask(task);
+            setEditingOccurrenceDate(null);
             setDialogOpen(true);
           }}
         />
@@ -220,6 +226,7 @@ export function PlannerApp({
         onOpenChange={setDialogOpen}
         demo={demo}
         task={editingTask}
+        occurrenceDate={editingOccurrenceDate}
         initialSchedule={newTaskSchedule}
         categories={categories}
         onCreated={upsertTask}

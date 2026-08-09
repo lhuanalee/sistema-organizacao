@@ -19,6 +19,8 @@ export interface TaskDTO {
   allDay: boolean;
   categoryId: string | null;
   recurringDaysOfWeek: number[];
+  recurringUntil: string | null;
+  recurringExcludedDates: string[];
 }
 
 export const TASK_TYPE_LABEL: Record<TaskType, string> = {

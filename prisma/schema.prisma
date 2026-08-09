@@ -68,6 +68,10 @@ model Task {
   // `start`'s date is the anchor the recurrence begins from; its time of
   // day (and `end`'s) is reused as the weekly start/end time.
   recurringDaysOfWeek Int[] @default([])
+  // Series stops occurring on/after this date ("delete this and following").
+  recurringUntil DateTime?
+  // Individual occurrence dates skipped ("delete only this occurrence").
+  recurringExcludedDates DateTime[] @default([])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

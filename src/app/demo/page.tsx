@@ -34,6 +34,8 @@ const demoTasks: TaskDTO[] = [
     allDay: false,
     categoryId: "cat-trabalho",
     recurringDaysOfWeek: [],
+    recurringUntil: null,
+    recurringExcludedDates: [],
   },
   {
     id: "demo-task-2",
@@ -47,6 +49,8 @@ const demoTasks: TaskDTO[] = [
     allDay: false,
     categoryId: "cat-saude",
     recurringDaysOfWeek: [],
+    recurringUntil: null,
+    recurringExcludedDates: [],
   },
   {
     id: "demo-task-3",
@@ -60,6 +64,8 @@ const demoTasks: TaskDTO[] = [
     allDay: false,
     categoryId: "cat-casa",
     recurringDaysOfWeek: [],
+    recurringUntil: null,
+    recurringExcludedDates: [],
   },
   {
     id: "demo-task-4",
@@ -73,6 +79,8 @@ const demoTasks: TaskDTO[] = [
     allDay: false,
     categoryId: "cat-saude",
     recurringDaysOfWeek: [],
+    recurringUntil: null,
+    recurringExcludedDates: [],
   },
   {
     id: "demo-task-5",
@@ -86,6 +94,8 @@ const demoTasks: TaskDTO[] = [
     allDay: false,
     categoryId: "cat-pessoal",
     recurringDaysOfWeek: [],
+    recurringUntil: null,
+    recurringExcludedDates: [],
   },
   {
     id: "demo-task-6",
@@ -99,6 +109,8 @@ const demoTasks: TaskDTO[] = [
     allDay: false,
     categoryId: "cat-casa",
     recurringDaysOfWeek: [],
+    recurringUntil: null,
+    recurringExcludedDates: [],
   },
   {
     id: "demo-task-7",
@@ -112,6 +124,8 @@ const demoTasks: TaskDTO[] = [
     allDay: false,
     categoryId: "cat-pessoal",
     recurringDaysOfWeek: [],
+    recurringUntil: null,
+    recurringExcludedDates: [],
   },
   {
     id: "demo-task-8",
@@ -125,6 +139,8 @@ const demoTasks: TaskDTO[] = [
     allDay: false,
     categoryId: "cat-faculdade",
     recurringDaysOfWeek: [1, 3],
+    recurringUntil: null,
+    recurringExcludedDates: [],
   },
 ];
 

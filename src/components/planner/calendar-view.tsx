@@ -14,6 +14,7 @@ import type {
   EventContentArg,
   EventDropArg,
   EventInput,
+  EventMountArg,
 } from "@fullcalendar/core";
 import { CategoryDTO, TaskDTO } from "@/lib/types";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -31,7 +32,7 @@ export function CalendarView({
   categories: CategoryDTO[];
   onDropNewTask: (taskId: string, start: string, end: string, allDay: boolean) => void;
   onEventChange: (taskId: string, start: string, end: string, allDay: boolean) => void;
-  onEventClick: (taskId: string) => void;
+  onEventClick: (taskId: string, occurrenceStart: string) => void;
   onSelectSlot: (start: string, end: string, allDay: boolean) => void;
 }) {
   const categoryById = useMemo(
@@ -73,6 +74,9 @@ export function CalendarView({
               startTime: format(start, "HH:mm:ss"),
               endTime: format(end, "HH:mm:ss"),
               startRecur: format(start, "yyyy-MM-dd"),
+              endRecur: t.recurringUntil
+                ? format(new Date(t.recurringUntil), "yyyy-MM-dd")
+                : undefined,
               // Recurring instances are edited via the dialog (applies to
               // every occurrence), not by dragging one on the calendar.
               editable: false,
@@ -88,6 +92,22 @@ export function CalendarView({
         }),
     [tasks, categoryById]
   );
+
+  // A single skipped occurrence ("delete only this one") isn't something
+  // FullCalendar's simple daysOfWeek recurrence can express, so the whole
+  // series still renders and the excluded date is hidden after mount.
+  const excludedDatesByTaskId = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const t of tasks) {
+      if (t.recurringExcludedDates.length > 0) {
+        map.set(
+          t.id,
+          new Set(t.recurringExcludedDates.map((d) => format(new Date(d), "yyyy-MM-dd")))
+        );
+      }
+    }
+    return map;
+  }, [tasks]);
 
   return (
     <div className="h-full rounded-3xl border bg-card p-3 shadow-sm [&_.fc]:h-full">
@@ -131,6 +151,15 @@ export function CalendarView({
         eventDisplay="block"
         events={events}
         eventContent={renderEventContent}
+        eventDidMount={(info: EventMountArg) => {
+          const excluded = excludedDatesByTaskId.get(info.event.id);
+          if (excluded && info.event.start) {
+            const dateKey = format(info.event.start, "yyyy-MM-dd");
+            if (excluded.has(dateKey)) {
+              info.el.style.display = "none";
+            }
+          }
+        }}
         eventReceive={(info: EventReceiveArg) => {
           const taskId = info.event.id;
           const start = info.event.start!;
@@ -152,7 +181,7 @@ export function CalendarView({
           onEventChange(info.event.id, start.toISOString(), end.toISOString(), info.event.allDay);
         }}
         eventClick={(info: EventClickArg) => {
-          onEventClick(info.event.id);
+          onEventClick(info.event.id, (info.event.start ?? new Date()).toISOString());
         }}
         select={(info: DateSelectArg) => {
           onSelectSlot(
